@@ -1,6 +1,7 @@
-package homework;
+package homework2;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ComplexExamples {
 
@@ -48,6 +49,7 @@ public class ComplexExamples {
             new Person(6, "Amelia"),
             new Person(7, "Amelia"),
             new Person(8, "Amelia"),
+            //new Person(9, null),
     };
         /*  Raw data:
 
@@ -98,10 +100,14 @@ public class ComplexExamples {
         System.out.println();
 
 
-        task1Solution();
+        task1Solution(RAW_DATA);
+        task1Solution(null);
 
-       int[] ints = {3, 4, 2, 7};
-        System.out.println(task2Solution(ints, 10));
+        System.out.println(task2Solution(new int[]{3, 4, 2, 7}, 10));
+        System.out.println(task2Solution(new int[]{3, 4, 5, 1, 2}, 10));
+        System.out.println(task2Solution(null, 10));
+
+        System.out.println();
 
         System.out.println(fuzzySearch("car", "ca6$$#_rtwheel")); // true
         System.out.println(fuzzySearch("cwhl", "cartwheel")); // true
@@ -109,6 +115,7 @@ public class ComplexExamples {
         System.out.println(fuzzySearch("cartwheel", "cartwheel")); // true
         System.out.println(fuzzySearch("cwheeel", "cartwheel")); // false
         System.out.println(fuzzySearch("lw", "cartwheel")); // false
+        System.out.println(fuzzySearch(null, "cartwheel")); // false
     }
 
 
@@ -126,24 +133,25 @@ public class ComplexExamples {
      * Key: Jack
      * Value:1
      */
-    public static void task1Solution() {
-        Map<String, Integer> personMap = new HashMap<>();
+    public static void task1Solution(Person[] persons) {
+            if (persons != null) {
+            List<Person> uniquePersons = Arrays.stream(persons)
+                    .filter(p -> Objects.nonNull(p.name))
+                    .distinct()
+                    .toList();
 
-        List<Person> uniquePersons = Arrays.stream(RAW_DATA)
-                .filter(p -> Objects.nonNull(p.id) && Objects.nonNull(p.name))
-                .distinct()
-                .sorted(Comparator.comparing(Person::getName))
-                .toList();
+            Map<String, Integer> frequency = uniquePersons.stream()
+                    .collect(Collectors.toMap(
+                            e -> e.getName(),
+                            e -> 1,
+                            Integer::sum));
 
-        uniquePersons.forEach(person -> personMap.put(person.getName(), (int) uniquePersons.stream()
-                .filter(p -> p.getName().equals(person.getName()))
-                .count()));
-
-        for (Map.Entry<String, Integer> entry : personMap.entrySet()) {
-            System.out.println("Key: " + entry.getKey());
-            System.out.println("Value:" + entry.getValue());
-        }
-        System.out.println();
+            frequency.forEach((k, v) -> System.out.println("Key: " + k + "\n" + "Value: " + v));
+            System.out.println();
+        }else {
+                System.out.println("Error: check input data");
+                System.out.println();
+            }
     }
 
 
@@ -153,18 +161,18 @@ public class ComplexExamples {
      * [3, 4, 2, 7], 10 -> [3, 7] - вывести пару менно в скобках, которые дают сумму - 10
      */
     public static String task2Solution(int[] sourceArray, int checkedValue) {
-
-        for (int i = 0; i < sourceArray.length; i++) {
-            for (int j = i + 1; j < sourceArray.length; j++) {
-                if (sourceArray[i] + sourceArray[j] == checkedValue) {
-                    //System.out.println("[" + sourceArray[i] + ", " + sourceArray[j] + "]");
-                    return String.format("[%d, %d]\n", sourceArray[i], sourceArray[j]);
+        if (sourceArray != null) {
+            for (int i = 0; i < sourceArray.length; i++) {
+                for (int j = i + 1; j < sourceArray.length; j++) {
+                    if (sourceArray[i] + sourceArray[j] == checkedValue) {
+                        return String.format("[%d, %d]\n", sourceArray[i], sourceArray[j]);
+                    }
                 }
-            }
+            }return "No matches";
         }
-        return "No matches";
-    }
+        return "Error: check input data";
 
+    }
 
     /**
      * Task3
@@ -178,17 +186,22 @@ public class ComplexExamples {
      * fuzzySearch("lw", "cartwheel"); // false
      */
     public static boolean fuzzySearch(String pattern, String input) {
-        char ch;
-        int indexFound;
-        StringBuilder sb = new StringBuilder(input);
-        for (int i = 0; i < pattern.length(); i++) {
-            ch = pattern.charAt(i);
-            indexFound = sb.toString().indexOf(ch);
-            if (indexFound >= 0) {
-                    sb = new StringBuilder(sb.substring(indexFound + 1));
-            } else return false;
-        }
-        return true;
+            if (pattern != null && input != null) {
+                char ch;
+                int indexFound;
+                StringBuilder sb = new StringBuilder(input);
+                for (int i = 0; i < pattern.length(); i++) {
+                    ch = pattern.charAt(i);
+                    indexFound = sb.toString().indexOf(ch);
+                    if (indexFound >= 0) {
+                        sb = new StringBuilder(sb.substring(indexFound + 1));
+                    } else return false;
+                }
+                return true;
+            }
+        System.out.println("Error: check input data");
+            return false;
     }
+
 
 }
